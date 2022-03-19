@@ -9,19 +9,39 @@ import (
 	"github.com/go-gl/glfw/v3.3/glfw"
 )
 
-var currentEngine *engine
-
 type DEngine interface {
 	Run() error
+	AddGameObject(g components.GameObject)
 }
 
-func CreateEngine(window *glfw.Window) (DEngine, error) {
-	rSys := renderer.SingleBatch(window)
-	if rSysErr := rSys.Init(); rSysErr != nil {
-		return nil, rSysErr
+type DEngineBuilder struct {
+	engine *engine
+}
+
+func Builder() *DEngineBuilder {
+	return &DEngineBuilder{
+		engine: &engine{minFrameTime: time.Millisecond * 200},
 	}
-	currentEngine = &engine{window: window, rSys: rSys, minFrameTime: time.Millisecond * 200}
-	return currentEngine, nil
+}
+
+func (db *DEngineBuilder) MinFrameTime(duration time.Duration) *DEngineBuilder {
+	db.engine.minFrameTime = duration
+	return db
+}
+
+func (db *DEngineBuilder) Window(w *glfw.Window) *DEngineBuilder {
+	db.engine.window = w
+	db.engine.rSys = nil // We have to reset this since the render system depends on this
+	return db
+}
+
+func (db *DEngineBuilder) RenderSystem(rSys renderer.RenderSystem) *DEngineBuilder {
+	db.engine.rSys = rSys
+	return db
+}
+
+func (db *DEngineBuilder) Build() DEngine {
+	return db.engine
 }
 
 var _ DEngine = (*engine)(nil)
@@ -35,13 +55,6 @@ type engine struct {
 	ogKeyCb      glfw.KeyCallback
 	rSys         renderer.RenderSystem
 	minFrameTime time.Duration
-}
-
-func AddGameObject(g components.GameObject) {
-	if currentEngine == nil {
-		return
-	}
-	currentEngine.AddGameObject(g)
 }
 
 func (e *engine) AddGameObject(g components.GameObject) {
@@ -65,11 +78,16 @@ func (e *engine) handleKeySubs(_ *glfw.Window, key glfw.Key, _ int, action glfw.
 
 func (e *engine) Run() error {
 	log.Println("starting DE")
+	initErr := e.rSys.Init()
+	if initErr != nil {
+		return initErr
+	}
 
 	delta := time.Duration(0)
 	e.ogKeyCb = e.window.SetKeyCallback(e.handleKeySubs)
 	defer e.window.SetKeyCallback(e.ogKeyCb)
 	lastTime := time.Now()
+	log.Println("DE initialized, entering game loop")
 	for !e.window.ShouldClose() {
 		for i := 0; i < len(e.uObjs); i++ {
 			e.uObjs[i].Update(delta)

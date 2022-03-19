@@ -7,6 +7,7 @@ import (
 	"github.com/droidkfx/go-games/engine/pkg/de"
 	"github.com/droidkfx/go-games/engine/pkg/gl_util"
 	_ "github.com/droidkfx/go-games/engine/pkg/gl_util"
+	"github.com/droidkfx/go-games/engine/pkg/renderer"
 )
 
 func main() {
@@ -17,12 +18,11 @@ func main() {
 	}
 	defer gl_util.UnInitialize()
 
-	engine, initErr := de.CreateEngine(window)
-	if initErr != nil {
-		log.Fatalf(initErr.Error())
-	}
+	rootRenderer := renderer.RoutingMultiRenderSystem(window)
+	rootRenderer.SetMapping(renderer.SingleBatch(window))
+	engine := de.Builder().Window(window).RenderSystem(rootRenderer).Build()
 
-	de.AddGameObject(c_impl.TestTriangle())
+	engine.AddGameObject(c_impl.TestTriangle())
 
 	if runErr := engine.Run(); runErr != nil {
 		log.Fatalf(runErr.Error())

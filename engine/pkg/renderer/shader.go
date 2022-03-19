@@ -31,7 +31,7 @@ func NewShader(name string) (Shader, error) {
 	shaderProgram := gl.CreateProgram()
 	shaderSrc := make(map[uint32]uint32, 2)
 
-	log.Println("compiling cloaded shaders")
+	log.Println("compiling shaders")
 	for shaderType, src := range shaderSrcs {
 		shaderPart, compileErr := compileShaderFile(shaderType, src)
 		if compileErr != nil {
@@ -42,7 +42,7 @@ func NewShader(name string) (Shader, error) {
 		gl.DeleteShader(shaderPart)
 	}
 
-	log.Println("linking shader shaders")
+	log.Println("linking shaders")
 	if linkErr := linkShader(shaderProgram); linkErr != nil {
 		return Shader{}, linkErr
 	}

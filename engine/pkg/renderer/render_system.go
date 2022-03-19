@@ -4,7 +4,6 @@ import (
 	"log"
 
 	"github.com/droidkfx/go-games/engine/pkg/components"
-	"github.com/droidkfx/go-games/engine/pkg/gl_util"
 	"github.com/go-gl/gl/v4.1-core/gl"
 	"github.com/go-gl/glfw/v3.3/glfw"
 )
@@ -15,75 +14,53 @@ type RenderSystem interface {
 	Render()
 }
 
-func SingleBatch(window *glfw.Window) RenderSystem {
-	sys := &singleBatchRenderSystem{
-		window: window,
-	}
-
-	gl.GenBuffers(1, &sys.vbo)
-	gl.BindBuffer(gl.ARRAY_BUFFER, sys.vbo)
-
-	gl.GenBuffers(1, &sys.ebo)
-	gl.BindBuffer(gl.ELEMENT_ARRAY_BUFFER, sys.ebo)
-
-	gl.GenVertexArrays(1, &sys.vao)
-	gl.BindVertexArray(sys.vao)
-	gl.EnableVertexAttribArray(0)
-	gl.VertexAttribPointerWithOffset(0, 2, gl.FLOAT, false, 5*gl_util.SizeofFloat32, 0)
-	gl.EnableVertexAttribArray(1)
-	gl.VertexAttribPointerWithOffset(1, 3, gl.FLOAT, false, 5*gl_util.SizeofFloat32, 2*gl_util.SizeofFloat32)
-
-	return sys
+type TypedRenderSystem interface {
+	RenderSystem
+	Type() components.RenderType
 }
 
-var _ RenderSystem = (*singleBatchRenderSystem)(nil)
-
-type singleBatchRenderSystem struct {
-	window              *glfw.Window
-	vbo, ebo, vao       uint32
-	currentVertexOffset uint32
-	shader              Shader
-	vertexList          []float32
-	elementList         []uint32
+type MappingRenderSystem interface {
+	RenderSystem
+	SetMapping(s TypedRenderSystem)
 }
 
-func (s *singleBatchRenderSystem) Init() error {
-	shader, shaderErr := NewShader("default")
-	if shaderErr != nil {
-		return shaderErr
+func RoutingMultiRenderSystem(window *glfw.Window) MappingRenderSystem {
+	return &routingMultiRenderSystem{renderers: map[components.RenderType]RenderSystem{}, w: window}
+}
+
+var _ MappingRenderSystem = (*routingMultiRenderSystem)(nil)
+
+type routingMultiRenderSystem struct {
+	w         *glfw.Window
+	renderers map[components.RenderType]RenderSystem
+}
+
+func (r *routingMultiRenderSystem) SetMapping(s TypedRenderSystem) {
+	r.renderers[s.Type()] = s
+}
+
+func (r *routingMultiRenderSystem) Init() error {
+	for _, s := range r.renderers {
+		if err := s.Init(); err != nil {
+			return err
+		}
 	}
-	s.shader = shader
-	s.shader.Use()
 	return nil
 }
 
-func (s *singleBatchRenderSystem) Process(ro components.RenderObject) {
-	if ro.Type() != components.RenderType_MESH {
-		log.Println("Tried to paint non mesh render object")
-		return
+func (r *routingMultiRenderSystem) Process(ro components.RenderObject) {
+	if s, ok := r.renderers[ro.Type()]; ok {
+		s.Process(ro)
+	} else {
+		log.Printf("Render type %+v not mapped to a render system. Skipping.\n", ro.Type())
 	}
-	mro := ro.(components.MeshRender)
-
-	vD, eD := mro.GetMeshData()
-	for i := 0; i < len(eD); i++ {
-		eD[i] = eD[i] + s.currentVertexOffset
-	}
-	s.vertexList = append(s.vertexList, vD...)
-	s.elementList = append(s.elementList, eD...)
-
-	s.currentVertexOffset += uint32(len(eD))
 }
 
-func (s *singleBatchRenderSystem) Render() {
-
-	gl.BufferData(gl.ARRAY_BUFFER, len(s.vertexList)*gl_util.SizeofFloat32, gl.Ptr(s.vertexList), gl.STREAM_DRAW)
-	gl.DrawElements(gl.TRIANGLES, int32(len(s.elementList)), gl.UNSIGNED_INT, gl.Ptr(s.elementList))
-
-	s.window.SwapBuffers()
-
+func (r *routingMultiRenderSystem) Render() {
+	for _, s := range r.renderers {
+		s.Render()
+	}
+	r.w.SwapBuffers()
 	// Clean up for next render call
-	s.currentVertexOffset = 0
 	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-	s.vertexList = make([]float32, 0, len(s.vertexList))
-	s.elementList = make([]uint32, 0, len(s.elementList))
 }
