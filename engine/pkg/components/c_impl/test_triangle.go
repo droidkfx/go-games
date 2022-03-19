@@ -1,31 +1,36 @@
 package c_impl
 
 import (
+	"log"
 	"time"
 
 	"github.com/droidkfx/go-games/engine/pkg/components"
 	"github.com/droidkfx/go-games/engine/pkg/d_types"
+	"github.com/go-gl/glfw/v3.3/glfw"
 )
 
 var _ components.GameObject = (*SimpleTriangle)(nil)
 var _ components.RenderObject = (*SimpleTriangle)(nil)
 var _ components.MeshRender = (*SimpleTriangle)(nil)
 var _ components.UpdatableObject = (*SimpleTriangle)(nil)
+var _ components.KeyInputListener = (*SimpleTriangle)(nil)
 
 type SimpleTriangle struct {
 	components.MeshRenderObject
 	position d_types.V2f32
 	size     float32
 	modifier float32
+	minSize  float32
+	maxSize  float32
 }
 
 func TestTriangle() components.GameObject {
-	return &SimpleTriangle{size: 0.5, modifier: 0.3}
+	return &SimpleTriangle{size: 0.5, modifier: 0.3, minSize: 0.1, maxSize: 1.0}
 }
 
 func (s *SimpleTriangle) Update(delta time.Duration) {
 	s.size += (float32(delta) / float32(time.Second)) * s.modifier
-	if s.size > 1 || s.size < 0.1 {
+	if (s.size > s.maxSize && s.modifier > 0) || (s.size < s.minSize && s.modifier < 0) {
 		s.modifier *= -1
 	}
 }
@@ -39,4 +44,27 @@ func (s *SimpleTriangle) GetMeshData() ([]float32, []uint32) {
 		botLeft.X, botLeft.Y, 0.0, 1.0, 0.0,
 		botRight.X, botRight.Y, 0.0, 0.0, 1.0,
 	}, []uint32{0, 1, 2}
+}
+
+func (s *SimpleTriangle) HandleKeyInput(key glfw.Key, action glfw.Action, _ glfw.ModifierKey) {
+	if action == glfw.Press || action == glfw.Repeat {
+		switch key {
+		case glfw.KeyUp:
+			if s.modifier > 0 {
+				s.modifier += 0.05
+			} else {
+				s.modifier -= 0.05
+			}
+			log.Printf("triangle speed modifier %f\n", s.modifier)
+		case glfw.KeyDown:
+			if s.modifier > 0 {
+				s.modifier -= 0.05
+			} else {
+				s.modifier += 0.05
+			}
+			log.Printf("triangle speed modifier %f\n", s.modifier)
+		case glfw.KeySpace:
+			log.Printf("%+v", s)
+		}
+	}
 }
