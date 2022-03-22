@@ -9,7 +9,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/go-gl/gl/v4.1-core/gl"
+	"github.com/go-gl/gl/all-core/gl"
 )
 
 const (
@@ -22,12 +22,16 @@ type Shader struct {
 	inuse     bool
 }
 
-func NewShader(name string) (Shader, error) {
+func ShaderFromFiles(name string) (Shader, error) {
 	shaderSrcs, srcErr := loadShaderFiles(name)
 	if srcErr != nil {
 		return Shader{}, srcErr
 	}
 
+	return ShaderFromSources(shaderSrcs)
+}
+
+func ShaderFromSources(shaderSrcs map[uint32][]byte) (Shader, error) {
 	shaderProgram := gl.CreateProgram()
 	shaderSrc := make(map[uint32]uint32, 2)
 

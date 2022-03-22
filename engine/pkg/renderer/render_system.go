@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/droidkfx/go-games/engine/pkg/components"
-	"github.com/go-gl/gl/v4.1-core/gl"
+	"github.com/go-gl/gl/all-core/gl"
 	"github.com/go-gl/glfw/v3.3/glfw"
 )
 
@@ -40,6 +40,7 @@ func (r *routingMultiRenderSystem) SetMapping(s TypedRenderSystem) {
 }
 
 func (r *routingMultiRenderSystem) Init() error {
+	gl.Enable(gl.DEPTH_TEST)
 	for _, s := range r.renderers {
 		if err := s.Init(); err != nil {
 			return err
