@@ -21,8 +21,6 @@ func main() {
 	}
 
 	font, err := ttf.ParseFont(fontBytes)
-	if err != nil {
-		fmt.Printf("ParseErr: %s\n\n", err)
-		spew.Dump(font)
-	}
+	fmt.Printf("ParseErr: %s\n\n", err)
+	spew.Dump(font)
 }
