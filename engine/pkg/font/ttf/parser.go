@@ -8,13 +8,6 @@ import (
 	"reflect"
 )
 
-const (
-	sizeOfUint64 = 8
-	sizeOfUint32 = 4
-	sizeOfUint16 = 2
-	sizeOfUint8  = 1
-)
-
 func parse[T any](data io.Reader) T {
 	var val T
 	readStructure(&val, data)

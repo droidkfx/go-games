@@ -4,71 +4,24 @@ import (
 	"io"
 )
 
-type Table string
-
-//goland:noinspection GoUnusedConst,GoSnakeCaseUsage,GoNameStartsWithPackageName
-const (
-	TUFTTable_AccentAttachment Table = "acnt"
-	TTFTable_ankr              Table = "ankr"
-	TTFTable_avar              Table = "avar"
-	TTFTable_bdat              Table = "bdat"
-	TTFTable_bhed              Table = "bhed"
-	TTFTable_bloc              Table = "bloc"
-	TTFTable_bsln              Table = "bsln"
-	TTFTable_cmap              Table = "cmap"
-	TTFTable_cvar              Table = "cvar"
-	TTFTable_cvt               Table = "cvt "
-	TTFTable_EBSC              Table = "EBSC"
-	TTFTable_fdsc              Table = "fdsc"
-	TTFTable_feat              Table = "feat"
-	TTFTable_fmtx              Table = "fmtx"
-	TTFTable_fond              Table = "fond"
-	TTFTable_fpgm              Table = "fpgm"
-	TTFTable_fvar              Table = "fvar"
-	TTFTable_gasp              Table = "gasp"
-	TTFTable_gcid              Table = "gcid"
-	TTFTable_glyf              Table = "glyf"
-	TTFTable_gvar              Table = "gvar"
-	TTFTable_hdmx              Table = "hdmx"
-	TTFTable_head              Table = "head"
-	TTFTable_hhea              Table = "hhea"
-	TTFTable_hmtx              Table = "hmtx"
-	TTFTable_just              Table = "just"
-	TTFTable_kern              Table = "kern"
-	TTFTable_kerx              Table = "kerx"
-	TTFTable_lcar              Table = "lcar"
-	TTFTable_loca              Table = "loca"
-	TTFTable_ltag              Table = "ltag"
-	TTFTable_maxp              Table = "maxp"
-	TTFTable_meta              Table = "meta"
-	TTFTable_mort              Table = "mort"
-	TTFTable_morx              Table = "morx"
-	TTFTable_name              Table = "name"
-	TTFTable_opbd              Table = "opbd"
-	TTFTable_OS2               Table = "OS/2"
-	TTFTable_post              Table = "post"
-	TTFTable_prep              Table = "prep"
-	TTFTable_prop              Table = "prop"
-	TTFTable_sbix              Table = "sbix"
-	TTFTable_trak              Table = "trak"
-	TTFTable_vhea              Table = "vhea"
-	TTFTable_vmtx              Table = "vmtx"
-	TTFTable_xref              Table = "xref"
-	TTFTable_Zapf              Table = "Zapf"
-)
+var _ Table = (*Directory)(nil)
 
 type Directory struct {
 	head   DirectoryHeader
-	tables map[Table]DirectoryRow
+	tables map[TableType]DirectoryRow
 }
 
-func (d Directory) sizeInFile() uint {
-	return uint((4 + (2 * 4)) + (len(d.tables) * (4 * 4)))
+func (d Directory) Type() TableType {
+	return TableType_Directory
 }
 
-func parseDirectory(data io.Reader) Directory {
+func (d Directory) SizeInFile() uint {
+	return uint((sizeOfUint32 + (sizeOfUint16 * 4)) + (len(d.tables) * (sizeOfUint32 * 4)))
+}
+
+func parseDirectory(data io.Reader) any {
 	head := parseDirectoryHead(data)
-	tMap := map[Table]DirectoryRow{}
+	tMap := map[TableType]DirectoryRow{}
 	for i := uint16(0); i < head.NumTables; i++ {
 		row := parseDirectoryRow(data)
 		tMap[row.Table()] = row
@@ -111,8 +64,8 @@ type DirectoryRow struct {
 	Length uint32
 }
 
-func (d DirectoryRow) Table() Table {
-	return Table(uint32ToString(d.Tag))
+func (d DirectoryRow) Table() TableType {
+	return TableType(uint32ToString(d.Tag))
 }
 
 func parseDirectoryRow(data io.Reader) DirectoryRow {
