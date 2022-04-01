@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/droidkfx/go-games/engine/pkg/font/ttf"
 )
 
@@ -19,8 +20,9 @@ func main() {
 		panic(err)
 	}
 
-	_, err = ttf.ParseFont(fontBytes)
+	font, err := ttf.ParseFont(fontBytes)
 	if err != nil {
-		fmt.Printf("%+v\n", err)
+		fmt.Printf("ParseErr: %s\n\n", err)
+		spew.Dump(font)
 	}
 }

@@ -3,12 +3,14 @@ package ttf
 type Table interface {
 	Type() TableType
 	SizeInFile() uint
+	IsOpenTypeTable() bool
 }
 
 type TableType string
 
 //goland:noinspection GoUnusedConst,GoSnakeCaseUsage,GoNameStartsWithPackageName
 const (
+	TableType_UNKNOWN   TableType = ""
 	TableType_acnt      TableType = "acnt"
 	TableType_ankr      TableType = "ankr"
 	TableType_avar      TableType = "avar"

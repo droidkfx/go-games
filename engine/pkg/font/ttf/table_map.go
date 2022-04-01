@@ -1,14 +1,17 @@
 package ttf
 
 import (
+	"errors"
+	"fmt"
 	"io"
 )
 
-func ParseTable[T any](tableType TableType, reader io.Reader) T {
+func ParseTable[T Table](tableType TableType, reader io.Reader) (T, error) {
 	if v, ok := parserMap[tableType]; ok {
-		return v(reader).(T)
+		return v(reader).(T), nil
+	} else {
+		return *new(T), errors.New(fmt.Sprintf("unknown type `%s` could not parse table skipping", tableType))
 	}
-	return *new(T)
 }
 
 var (
@@ -64,6 +67,12 @@ var (
 	}
 )
 
-func noop(_ io.Reader) any {
-	return nil
-}
+var _ Table = (*noopTable)(nil)
+
+type noopTable struct{}
+
+func (n noopTable) IsOpenTypeTable() bool { return false }
+func (n noopTable) SizeInFile() uint      { return 0 }
+func (n noopTable) Type() TableType       { return TableType_UNKNOWN }
+
+func noop(_ io.Reader) any { return &noopTable{} }

@@ -4,7 +4,10 @@ go 1.18
 
 replace github.com/droidkfx/go-games/engine => ../engine
 
-require github.com/droidkfx/go-games/engine v0.0.0-20220314224947-cf67b34bdb0f
+require (
+	github.com/davecgh/go-spew v1.1.1
+	github.com/droidkfx/go-games/engine v0.0.0-20220314224947-cf67b34bdb0f
+)
 
 require (
 	github.com/go-gl/gl v0.0.0-20211210172815-726fda9656d6 // indirect

@@ -2,6 +2,7 @@ package ttf
 
 import (
 	"io"
+	"math"
 )
 
 var _ Table = (*Directory)(nil)
@@ -9,6 +10,10 @@ var _ Table = (*Directory)(nil)
 type Directory struct {
 	head   DirectoryHeader
 	tables map[TableType]DirectoryRow
+}
+
+func (d Directory) IsOpenTypeTable() bool {
+	return false
 }
 
 func (d Directory) Type() TableType {
@@ -19,6 +24,20 @@ func (d Directory) SizeInFile() uint {
 	return uint((sizeOfUint32 + (sizeOfUint16 * 4)) + (len(d.tables) * (sizeOfUint32 * 4)))
 }
 
+func (d Directory) nextTableTypeAfterOffset(offset uint32) (DirectoryRow, bool) {
+	var nextTable DirectoryRow
+	hasNext := false
+	lowestOffset := uint32(math.MaxUint32)
+	for _, dirRow := range d.tables {
+		if dirRow.Offset < lowestOffset && dirRow.Offset > offset {
+			hasNext = true
+			nextTable = dirRow
+			lowestOffset = dirRow.Offset
+		}
+	}
+	return nextTable, hasNext
+}
+
 func parseDirectory(data io.Reader) any {
 	head := parseDirectoryHead(data)
 	tMap := map[TableType]DirectoryRow{}
@@ -26,7 +45,7 @@ func parseDirectory(data io.Reader) any {
 		row := parseDirectoryRow(data)
 		tMap[row.Table()] = row
 	}
-	return Directory{
+	return &Directory{
 		head:   head,
 		tables: tMap,
 	}
