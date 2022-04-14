@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/droidkfx/go-games/engine/pkg/font/ttf"
+	"github.com/droidkfx/go-games/fonts/pkg/ttf"
 )
 
 func main() {

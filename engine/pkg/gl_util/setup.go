@@ -56,7 +56,7 @@ func DefaultGlfwConfig() *GlfwConfig {
 			glfw.ContextVersionMinor:     1,
 			glfw.OpenGLProfile:           glfw.OpenGLCoreProfile,
 			glfw.OpenGLForwardCompatible: glfw.True,
-			glfw.Resizable:               glfw.False,
+			glfw.Resizable:               glfw.True,
 		},
 		fullscreen:   false,
 		windowWidth:  800,
