@@ -20,9 +20,8 @@ var _ TypedRenderSystem = (*singleBatchRenderSystem)(nil)
 
 type singleBatchRenderSystem struct {
 	window              *glfw.Window
-	vbo, ebo, vao       uint32
+	renderPipe          RenderPipeline
 	currentVertexOffset uint32
-	shader              Shader
 	vertexList          []float32
 	elementList         []uint32
 }
@@ -32,14 +31,17 @@ func (s *singleBatchRenderSystem) Type() components.RenderType {
 }
 
 func (s *singleBatchRenderSystem) Init() error {
-	gl.GenBuffers(1, &s.vbo)
-	gl.BindBuffer(gl.ARRAY_BUFFER, s.vbo)
+	rp := &defaultRenderPipeline{}
 
-	gl.GenBuffers(1, &s.ebo)
-	gl.BindBuffer(gl.ELEMENT_ARRAY_BUFFER, s.ebo)
+	gl.GenVertexArrays(1, &rp.vao)
+	gl.BindVertexArray(rp.vao)
 
-	gl.GenVertexArrays(1, &s.vao)
-	gl.BindVertexArray(s.vao)
+	gl.GenBuffers(1, &rp.vbo)
+	gl.BindBuffer(gl.ARRAY_BUFFER, rp.vbo)
+
+	gl.GenBuffers(1, &rp.ebo)
+	gl.BindBuffer(gl.ELEMENT_ARRAY_BUFFER, rp.ebo)
+
 	gl.EnableVertexAttribArray(0)
 	gl.VertexAttribPointerWithOffset(0, 2, gl.FLOAT, false, 5*gl_util.SizeofFloat32, 0)
 	gl.EnableVertexAttribArray(1)
@@ -48,11 +50,9 @@ func (s *singleBatchRenderSystem) Init() error {
 	if shaderErr != nil {
 		return shaderErr
 	}
-	s.shader = shader
-
-	gl.BindVertexArray(0)
-	gl.BindBuffer(gl.ARRAY_BUFFER, 0)
-	gl.BindBuffer(gl.ELEMENT_ARRAY_BUFFER, 0)
+	rp.shader = shader
+	rp.UnBind()
+	s.renderPipe = rp
 
 	return nil
 }
@@ -78,13 +78,10 @@ func (s *singleBatchRenderSystem) Render() {
 	if len(s.vertexList) == 0 {
 		return
 	}
-	s.shader.Use()
-	defer s.shader.Detach()
 
-	gl.BindVertexArray(s.vao)
-	defer gl.BindVertexArray(0)
-	gl.BindBuffer(gl.ARRAY_BUFFER, s.vbo)
-	defer gl.BindBuffer(gl.ARRAY_BUFFER, 0)
+	s.renderPipe.Bind()
+	defer s.renderPipe.UnBind()
+
 	gl.BufferData(gl.ARRAY_BUFFER, len(s.vertexList)*gl_util.SizeofFloat32, gl.Ptr(s.vertexList), gl.STREAM_DRAW)
 	gl.DrawElements(gl.TRIANGLES, int32(len(s.elementList)), gl.UNSIGNED_INT, gl.Ptr(s.elementList))
 
