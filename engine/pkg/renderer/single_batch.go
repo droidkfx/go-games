@@ -3,7 +3,7 @@ package renderer
 import (
 	"log"
 
-	"github.com/droidkfx/go-games/engine/pkg/components"
+	"github.com/droidkfx/go-games/engine/pkg/components/render"
 	"github.com/droidkfx/go-games/engine/pkg/gl_util"
 	"github.com/go-gl/gl/all-core/gl"
 	"github.com/go-gl/glfw/v3.3/glfw"
@@ -26,8 +26,8 @@ type singleBatchRenderSystem struct {
 	elementList         []uint32
 }
 
-func (s *singleBatchRenderSystem) Type() components.RenderType {
-	return components.RenderType_MESH
+func (s *singleBatchRenderSystem) Type() render.Type {
+	return render.TypeMesh
 }
 
 func (s *singleBatchRenderSystem) Init() error {
@@ -57,12 +57,12 @@ func (s *singleBatchRenderSystem) Init() error {
 	return nil
 }
 
-func (s *singleBatchRenderSystem) Process(ro components.RenderObject) {
-	if ro.Type() != components.RenderType_MESH {
+func (s *singleBatchRenderSystem) Process(ro render.BaseComponent) {
+	if ro.Type() != render.TypeMesh {
 		log.Println("Tried to paint non mesh render object")
 		return
 	}
-	mro := ro.(components.MeshRender)
+	mro := ro.(render.Mesh)
 
 	vD, eD := mro.GetMeshData()
 	for i := 0; i < len(eD); i++ {

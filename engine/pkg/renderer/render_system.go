@@ -3,20 +3,20 @@ package renderer
 import (
 	"log"
 
-	"github.com/droidkfx/go-games/engine/pkg/components"
+	"github.com/droidkfx/go-games/engine/pkg/components/render"
 	"github.com/go-gl/gl/all-core/gl"
 	"github.com/go-gl/glfw/v3.3/glfw"
 )
 
 type RenderSystem interface {
 	Init() error
-	Process(obj components.RenderObject)
+	Process(obj render.BaseComponent)
 	Render()
 }
 
 type TypedRenderSystem interface {
 	RenderSystem
-	Type() components.RenderType
+	Type() render.Type
 }
 
 type MappingRenderSystem interface {
@@ -25,14 +25,14 @@ type MappingRenderSystem interface {
 }
 
 func RoutingMultiRenderSystem(window *glfw.Window) MappingRenderSystem {
-	return &routingMultiRenderSystem{renderers: map[components.RenderType]RenderSystem{}, w: window}
+	return &routingMultiRenderSystem{renderers: map[render.Type]RenderSystem{}, w: window}
 }
 
 var _ MappingRenderSystem = (*routingMultiRenderSystem)(nil)
 
 type routingMultiRenderSystem struct {
 	w         *glfw.Window
-	renderers map[components.RenderType]RenderSystem
+	renderers map[render.Type]RenderSystem
 }
 
 func (r *routingMultiRenderSystem) SetMapping(s TypedRenderSystem) {
@@ -49,7 +49,7 @@ func (r *routingMultiRenderSystem) Init() error {
 	return nil
 }
 
-func (r *routingMultiRenderSystem) Process(ro components.RenderObject) {
+func (r *routingMultiRenderSystem) Process(ro render.BaseComponent) {
 	if s, ok := r.renderers[ro.Type()]; ok {
 		s.Process(ro)
 	} else {

@@ -3,7 +3,7 @@ package renderer
 import (
 	"log"
 
-	"github.com/droidkfx/go-games/engine/pkg/components"
+	"github.com/droidkfx/go-games/engine/pkg/components/render"
 	"github.com/droidkfx/go-games/engine/pkg/gl_util"
 	"github.com/go-gl/gl/all-core/gl"
 	"github.com/go-gl/glfw/v3.3/glfw"
@@ -26,8 +26,8 @@ type textRenderSystem struct {
 	elementList   []uint32
 }
 
-func (s *textRenderSystem) Type() components.RenderType {
-	return components.RenderType_TEXT
+func (s *textRenderSystem) Type() render.Type {
+	return render.TypeText
 }
 
 func (s *textRenderSystem) Init() error {
@@ -65,12 +65,12 @@ func (s *textRenderSystem) Init() error {
 	return nil
 }
 
-func (s *textRenderSystem) Process(ro components.RenderObject) {
-	if ro.Type() != components.RenderType_TEXT {
+func (s *textRenderSystem) Process(ro render.BaseComponent) {
+	if ro.Type() != render.TypeText {
 		log.Println("Tried to paint non mesh render object")
 		return
 	}
-	_ = ro.(components.TextRender)
+	_ = ro.(render.TextRender)
 }
 
 func (s *textRenderSystem) Render() {

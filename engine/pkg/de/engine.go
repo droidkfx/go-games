@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/droidkfx/go-games/engine/pkg/components"
+	"github.com/droidkfx/go-games/engine/pkg/components/render"
 	"github.com/droidkfx/go-games/engine/pkg/renderer"
 	"github.com/go-gl/glfw/v3.3/glfw"
 )
@@ -50,7 +51,7 @@ type engine struct {
 	window       *glfw.Window
 	objects      []components.GameObject
 	uObjs        []components.UpdatableObject
-	rObjs        []components.RenderObject
+	rObjs        []render.BaseComponent
 	iLs          []components.KeyInputListener
 	ogKeyCb      glfw.KeyCallback
 	rSys         renderer.RenderSystem
@@ -62,7 +63,7 @@ func (e *engine) AddGameObject(g components.GameObject) {
 	if liObj, ok := g.(components.KeyInputListener); ok {
 		e.iLs = append(e.iLs, liObj)
 	}
-	if rObj, ok := g.(components.RenderObject); ok {
+	if rObj, ok := g.(render.BaseComponent); ok {
 		e.rObjs = append(e.rObjs, rObj)
 	}
 	if uObj, ok := g.(components.UpdatableObject); ok {
