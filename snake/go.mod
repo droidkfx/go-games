@@ -6,7 +6,8 @@ replace github.com/droidkfx/go-games/engine => ../engine
 
 require (
 	github.com/davecgh/go-spew v1.1.1
-	github.com/droidkfx/go-games/engine v0.0.0-20220314224947-cf67b34bdb0f
+	github.com/droidkfx/go-games/engine v0.0.1
+	github.com/droidkfx/go-games/fonts v0.0.1
 )
 
 require (
