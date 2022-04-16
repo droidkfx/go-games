@@ -6,6 +6,7 @@ import (
 
 	"github.com/droidkfx/go-games/engine/pkg/components"
 	"github.com/droidkfx/go-games/engine/pkg/components/render"
+	"github.com/droidkfx/go-games/engine/pkg/components/render/shape"
 	"github.com/droidkfx/go-games/engine/pkg/d_types"
 	"github.com/go-gl/glfw/v3.3/glfw"
 )
@@ -40,15 +41,18 @@ type SimpleTriMesh struct {
 	size     float32
 }
 
-func (s *SimpleTriMesh) GetMeshData() ([]float32, []uint32) {
+func (s *SimpleTriMesh) GetMeshData() shape.Mesh {
 	top := s.position.Add(d_types.V2f32{Y: s.size})
 	botLeft := s.position.Add(d_types.V2f32{X: -s.size, Y: -s.size})
 	botRight := s.position.Add(d_types.V2f32{X: s.size, Y: -s.size})
-	return []float32{
-		top.X, top.Y, 1.0, 0.0, 0.0,
-		botLeft.X, botLeft.Y, 0.0, 1.0, 0.0,
-		botRight.X, botRight.Y, 0.0, 0.0, 1.0,
-	}, []uint32{0, 1, 2}
+	return shape.Mesh{
+		Verts: []float32{
+			top.X, top.Y, 1.0, 0.0, 0.0,
+			botLeft.X, botLeft.Y, 0.0, 1.0, 0.0,
+			botRight.X, botRight.Y, 0.0, 0.0, 1.0,
+		},
+		Elems: []uint32{0, 1, 2},
+	}
 }
 
 func (s *SimpleTriangle) HandleKeyInput(key glfw.Key, action glfw.Action, _ glfw.ModifierKey) {

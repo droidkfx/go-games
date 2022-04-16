@@ -74,18 +74,18 @@ func (s *textRenderSystem) Process(ro render.BaseComponent) {
 }
 
 func (s *textRenderSystem) Render() {
-	if len(s.vertexList) == 0 {
-		return
-	}
-	s.shader.Use()
-	defer s.shader.Detach()
-
-	gl.BindVertexArray(s.vao)
-	defer gl.BindVertexArray(0)
-	gl.BindBuffer(gl.ARRAY_BUFFER, s.vbo)
-	defer gl.BindBuffer(gl.ARRAY_BUFFER, 0)
-	gl.BufferData(gl.ARRAY_BUFFER, len(s.vertexList)*gl_util.SizeofFloat32, gl.Ptr(s.vertexList), gl.STREAM_DRAW)
-	gl.DrawElements(gl.TRIANGLES, int32(len(s.elementList)), gl.UNSIGNED_INT, gl.Ptr(s.elementList))
+	// if len(s.vertexList) == 0 {
+	// 	return
+	// }
+	// s.shader.Use()
+	// defer s.shader.Detach()
+	//
+	// gl.BindVertexArray(s.vao)
+	// defer gl.BindVertexArray(0)
+	// gl.BindBuffer(gl.ARRAY_BUFFER, s.vbo)
+	// defer gl.BindBuffer(gl.ARRAY_BUFFER, 0)
+	// gl.BufferData(gl.ARRAY_BUFFER, len(s.vertexList)*gl_util.SizeofFloat32, gl.Ptr(s.vertexList), gl.STREAM_DRAW)
+	// gl.DrawElements(gl.TRIANGLES, int32(len(s.elementList)), gl.UNSIGNED_INT, gl.Ptr(s.elementList))
 
 	// s.vertexList = make([]float32, 0, len(s.vertexList))
 	// s.elementList = make([]uint32, 0, len(s.elementList))

@@ -1,8 +1,12 @@
 package render
 
+import (
+	"github.com/droidkfx/go-games/engine/pkg/components/render/shape"
+)
+
 type Mesh interface {
 	BaseComponent
-	GetMeshData() ([]float32, []uint32)
+	GetMeshData() shape.Mesh
 }
 
 var _ BaseComponent = (*RawMesh)(nil)
@@ -10,8 +14,8 @@ var _ Mesh = (*RawMesh)(nil)
 
 type RawMesh struct{}
 
-func (m *RawMesh) GetMeshData() ([]float32, []uint32) {
-	return make([]float32, 0), make([]uint32, 0)
+func (m *RawMesh) GetMeshData() shape.Mesh {
+	return shape.Mesh{}
 }
 
 func (m *RawMesh) Type() Type {
