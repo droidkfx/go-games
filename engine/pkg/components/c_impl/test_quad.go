@@ -14,10 +14,12 @@ var _ render.BaseComponent = (*SimpleQuad)(nil)
 var _ render.Mesh = (*SimpleQuad)(nil)
 var _ components.UpdatableObject = (*SimpleQuad)(nil)
 var _ components.KeyInputListener = (*SimpleQuad)(nil)
+var _ components.InitObject = (*SimpleQuad)(nil)
 
 type SimpleQuad struct {
 	SimpleQuadMesh
-	components.SimpleKeyLoggerListener
+	components.KeyInputLogger
+	components.InitLogger
 	modifier float32
 	minSize  float32
 	maxSize  float32

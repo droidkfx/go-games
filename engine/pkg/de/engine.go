@@ -60,6 +60,9 @@ type engine struct {
 
 func (e *engine) AddGameObject(g components.GameObject) {
 	e.objects = append(e.objects, g)
+	if inObj, ok := g.(components.InitObject); ok {
+		inObj.Init()
+	}
 	if liObj, ok := g.(components.KeyInputListener); ok {
 		e.iLs = append(e.iLs, liObj)
 	}

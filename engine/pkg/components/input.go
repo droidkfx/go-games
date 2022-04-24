@@ -11,10 +11,10 @@ type KeyInputListener interface {
 	HandleKeyInput(glfw.Key, glfw.Action, glfw.ModifierKey)
 }
 
-var _ KeyInputListener = (*SimpleKeyLoggerListener)(nil)
+var _ KeyInputListener = (*KeyInputLogger)(nil)
 
-type SimpleKeyLoggerListener struct{}
+type KeyInputLogger struct{}
 
-func (s *SimpleKeyLoggerListener) HandleKeyInput(key glfw.Key, action glfw.Action, mod glfw.ModifierKey) {
+func (s *KeyInputLogger) HandleKeyInput(key glfw.Key, action glfw.Action, mod glfw.ModifierKey) {
 	log.Printf("Key action: `%+v` Key Code: `%+v` Key Modifier: `%+v` \n", action, key, mod)
 }

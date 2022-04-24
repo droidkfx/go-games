@@ -17,7 +17,7 @@ var _ components.KeyInputListener = (*SimpleTriangle)(nil)
 
 type SimpleTriangle struct {
 	SimpleTriMesh
-	components.SimpleKeyLoggerListener
+	components.KeyInputLogger
 	modifier float32
 	minSize  float32
 	maxSize  float32
