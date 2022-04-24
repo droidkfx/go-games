@@ -9,13 +9,20 @@ type V2f32 struct {
 	X, Y float32
 }
 
-func (vf32 V2f32) Add(other V2f32) V2f32 {
+type V2f64 struct {
+	X, Y float32
+}
+
+func (v V2f32) Add(other V2f32) V2f32 {
 	return V2f32{
-		X: vf32.X + other.X,
-		Y: vf32.Y + other.Y,
+		X: v.X + other.X,
+		Y: v.Y + other.Y,
 	}
 }
 
-type V2f64 struct {
-	X, Y float32
+func (v V2f32) DivC(c float32) V2f32 {
+	return V2f32{
+		X: v.X / c,
+		Y: v.Y / c,
+	}
 }
