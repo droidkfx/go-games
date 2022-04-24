@@ -22,7 +22,7 @@ func main() {
 	rootRenderer.SetMapping(renderer.TextRenderSystem(window))
 	engine := de.Builder().Window(window).RenderSystem(rootRenderer).Build()
 
-	engine.AddGameObject(c_impl.TestTriangle())
+	engine.AddGameObject(c_impl.TestQuad())
 
 	if runErr := engine.Run(); runErr != nil {
 		log.Fatalf(runErr.Error())

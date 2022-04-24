@@ -2,9 +2,9 @@ module github.com/droidkfx/go-games/snake
 
 go 1.18
 
-replace github.com/droidkfx/go-games/engine => ../engine
+//replace github.com/droidkfx/go-games/engine => ../engine
 
-require github.com/droidkfx/go-games/engine v0.0.1
+require github.com/droidkfx/go-games/engine v0.0.4
 
 require (
 	github.com/go-gl/gl v0.0.0-20211210172815-726fda9656d6 // indirect
