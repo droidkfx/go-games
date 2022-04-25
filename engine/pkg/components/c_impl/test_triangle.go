@@ -45,11 +45,11 @@ func (s *SimpleTriMesh) GetMeshData() shape.Mesh {
 	botLeft := s.position.Add(d_types.V2f32{X: -s.size, Y: -s.size})
 	botRight := s.position.Add(d_types.V2f32{X: s.size, Y: -s.size})
 	return shape.Mesh{
-		Verts: []float32{
-			top.X, top.Y, 1.0, 0.0, 0.0,
-			botLeft.X, botLeft.Y, 0.0, 1.0, 0.0,
-			botRight.X, botRight.Y, 0.0, 0.0, 1.0,
+		Verts: []shape.MeshVert{
+			&shape.GenericMeshVert{Data: []float32{top.X, top.Y, 1.0, 0.0, 0.0}},
+			&shape.GenericMeshVert{Data: []float32{botLeft.X, botLeft.Y, 0.0, 1.0, 0.0}},
+			&shape.GenericMeshVert{Data: []float32{botRight.X, botRight.Y, 0.0, 0.0, 1.0}},
 		},
-		Elems: []uint32{0, 1, 2},
+		Elems: [][]uint32{{0, 1, 2}},
 	}
 }

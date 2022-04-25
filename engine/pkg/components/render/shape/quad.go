@@ -34,15 +34,15 @@ func Quad(locUL, locLR d_types.V2f32, cmap ColorMap) Mesh {
 	cLR := Color(locLR, cmap)
 
 	return Mesh{
-		Verts: []float32{
-			locUL.X, locUL.Y, cUL.R, cUL.G, cUL.B, // UL
-			locLR.X, locUL.Y, cUR.R, cUR.G, cUR.B, // UR
-			locUL.X, locLR.Y, cLL.R, cLL.G, cLL.B, // LL
-			locLR.X, locLR.Y, cLR.R, cLR.G, cLR.B, // LR
+		Verts: []MeshVert{
+			&GenericMeshVert{Data: []float32{locUL.X, locUL.Y, cUL.R, cUL.G, cUL.B}}, // UL
+			&GenericMeshVert{Data: []float32{locLR.X, locUL.Y, cUR.R, cUR.G, cUR.B}}, // UR
+			&GenericMeshVert{Data: []float32{locUL.X, locLR.Y, cLL.R, cLL.G, cLL.B}}, // LL
+			&GenericMeshVert{Data: []float32{locLR.X, locLR.Y, cLR.R, cLR.G, cLR.B}}, // LR
 		},
-		Elems: []uint32{
-			0, 3, 2,
-			0, 1, 3,
+		Elems: [][]uint32{
+			{0, 3, 2},
+			{0, 1, 3},
 		},
 	}
 }

@@ -69,13 +69,16 @@ func (s *singleBatchRenderSystem) Process(ro render.BaseComponent) {
 	mro := ro.(render.Mesh)
 
 	meshData := mro.GetMeshData()
-	for i := 0; i < len(meshData.Elems); i++ {
-		meshData.Elems[i] = meshData.Elems[i] + s.currentVertexOffset
-	}
-	s.vertexList = append(s.vertexList, meshData.Verts...)
-	s.elementList = append(s.elementList, meshData.Elems...)
+	meshData.OffsetElems(s.currentVertexOffset)
 
-	s.currentVertexOffset += uint32(len(meshData.Elems))
+	for _, vertData := range meshData.Verts {
+		s.vertexList = append(s.vertexList, vertData.GetVertData()...)
+	}
+	for _, elemData := range meshData.Elems {
+		s.elementList = append(s.elementList, elemData...)
+	}
+
+	s.currentVertexOffset += uint32(len(meshData.Verts))
 }
 
 func (s *singleBatchRenderSystem) Render() {
