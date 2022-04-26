@@ -13,6 +13,10 @@ type V2f64 struct {
 	X, Y float32
 }
 
+func (v V2f32) Eq(other V2f32) bool {
+	return v.X == other.X && v.Y == other.Y
+}
+
 func (v V2f32) Add(other V2f32) V2f32 {
 	return V2f32{
 		X: v.X + other.X,
