@@ -1,5 +1,9 @@
 package d_types
 
+import (
+	"math"
+)
+
 type Number interface {
 	int | int8 | int16 | int32 | int64
 	float32 | float64
@@ -15,6 +19,10 @@ type V2f64 struct {
 
 func (v V2f32) Eq(other V2f32) bool {
 	return v.X == other.X && v.Y == other.Y
+}
+
+func (v V2f32) EqEps(other V2f32, eps float64) bool {
+	return math.Abs(float64(v.X-other.X)) <= eps && math.Abs(float64(v.Y-other.Y)) <= eps
 }
 
 func (v V2f32) Add(other V2f32) V2f32 {
