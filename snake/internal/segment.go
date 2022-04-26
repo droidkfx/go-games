@@ -11,18 +11,13 @@ var _ components.GameObject = (*SnakeSegment)(nil)
 var _ render.BaseComponent = (*SnakeSegment)(nil)
 var _ render.Mesh = (*SnakeSegment)(nil)
 
-var snakeSegmentSize float32 = 0.05
-var snakeColor = d_types.Color_RED
-
-func NewSegment(loc d_types.V2f32) *SnakeSegment {
-	return &SnakeSegment{loc: loc}
-}
-
 type SnakeSegment struct {
 	render.RawMesh
-	loc d_types.V2f32
+	loc   d_types.V2f32
+	size  float32
+	color d_types.ColorRGB
 }
 
 func (m *SnakeSegment) GetMeshData() shape.Mesh {
-	return shape.SolidSquareCenteredAt(snakeSegmentSize, m.loc, snakeColor)
+	return shape.SolidSquareCenteredAt(m.size, m.loc, m.color)
 }
