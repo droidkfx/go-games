@@ -60,6 +60,9 @@ type engine struct {
 
 func (e *engine) AddGameObject(g components.GameObject) {
 	e.objects = append(e.objects, g)
+	if accessObj, ok := g.(EngineAccessor); ok {
+		accessObj.SetEngine(e)
+	}
 	if inObj, ok := g.(components.InitObject); ok {
 		inObj.Init()
 	}
