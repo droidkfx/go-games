@@ -14,20 +14,13 @@ var _ components.UpdatableObject = (*Snake)(nil)
 var _ components.KeyInputListener = (*Snake)(nil)
 var _ de.EngineAccessor = (*Snake)(nil)
 
-var (
-	snakeSegSize   float32 = 0.05
-	gridSize       float32 = 0.06
-	initialSize            = 5
-	liveSnakeColor         = d_types.Color_GREEN
-	deadSnakeColor         = d_types.Color_RED
-)
-
 type Snake struct {
 	de.DefaultEngineAccessor
-	segments      []*SnakeSegment
+	segments      []*Unit
 	direction     d_types.V2f32
 	nextDirection d_types.V2f32
 	dead          bool
+	grow          bool
 	ticker
 }
 
@@ -65,7 +58,7 @@ func (s *Snake) Tick() {
 	s.move()
 	// check first if we have set a direction. In the beginning we would not have
 	if (s.direction.X != 0.0 || s.direction.Y != 0.0) && s.hasOverlap() {
-		s.die()
+		s.Die()
 	}
 }
 
@@ -79,6 +72,12 @@ func (s *Snake) Init() {
 
 func (s *Snake) move() {
 	s.direction = s.nextDirection
+	var newSegment *Unit
+	if s.grow {
+		s.grow = false
+		newSegLoc := s.segments[len(s.segments)-1].loc
+		newSegment = &Unit{loc: newSegLoc, color: liveSnakeColor, size: snakeSegSize}
+	}
 	for i := len(s.segments) - 1; i >= 0; i-- {
 		if i == 0 {
 			s.segments[i].loc = s.segments[i].loc.Add(s.direction)
@@ -86,12 +85,16 @@ func (s *Snake) move() {
 			s.segments[i].loc = s.segments[i-1].loc
 		}
 	}
+	if newSegment != nil {
+		s.segments = append(s.segments, newSegment)
+		s.GetEngine().AddGameObject(newSegment)
+	}
 }
 
 func (s *Snake) setupInitialSegments() {
-	s.segments = make([]*SnakeSegment, 0, initialSize)
-	for i := 0; i < initialSize; i++ {
-		s.segments = append(s.segments, &SnakeSegment{size: snakeSegSize, color: liveSnakeColor})
+	s.segments = make([]*Unit, 0, initialSnakeLen)
+	for i := 0; i < initialSnakeLen; i++ {
+		s.segments = append(s.segments, &Unit{size: snakeSegSize, color: liveSnakeColor})
 	}
 }
 
@@ -105,9 +108,13 @@ func (s *Snake) hasOverlap() bool {
 	return false
 }
 
-func (s *Snake) die() {
+func (s *Snake) Die() {
 	s.dead = true
 	for _, seg := range s.segments {
 		seg.color = deadSnakeColor
 	}
+}
+
+func (s *Snake) Grow() {
+	s.grow = true
 }

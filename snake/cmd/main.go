@@ -24,7 +24,7 @@ func main() {
 	rootRenderer.SetMapping(renderer.TextRenderSystem(window))
 	engine := de.Builder().Window(window).RenderSystem(rootRenderer).Build()
 
-	engine.AddGameObject(&internal.Snake{})
+	engine.AddGameObject(&internal.Controller{})
 
 	if runErr := engine.Run(); runErr != nil {
 		log.Fatalf(runErr.Error())
