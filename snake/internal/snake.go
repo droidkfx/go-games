@@ -24,9 +24,10 @@ var (
 
 type Snake struct {
 	de.DefaultEngineAccessor
-	segments  []*SnakeSegment
-	direction d_types.V2f32
-	dead      bool
+	segments      []*SnakeSegment
+	direction     d_types.V2f32
+	nextDirection d_types.V2f32
+	dead          bool
 	ticker
 }
 
@@ -35,19 +36,19 @@ func (s *Snake) HandleKeyInput(key glfw.Key, action glfw.Action, _ glfw.Modifier
 		switch key {
 		case glfw.KeyA:
 			if s.direction.X == 0.0 {
-				s.direction = d_types.V2f32{X: -gridSize}
+				s.nextDirection = d_types.V2f32{X: -gridSize}
 			}
 		case glfw.KeyD:
 			if s.direction.X == 0.0 {
-				s.direction = d_types.V2f32{X: gridSize}
+				s.nextDirection = d_types.V2f32{X: gridSize}
 			}
 		case glfw.KeyW:
 			if s.direction.Y == 0.0 {
-				s.direction = d_types.V2f32{Y: gridSize}
+				s.nextDirection = d_types.V2f32{Y: gridSize}
 			}
 		case glfw.KeyS:
 			if s.direction.Y == 0.0 {
-				s.direction = d_types.V2f32{Y: -gridSize}
+				s.nextDirection = d_types.V2f32{Y: -gridSize}
 			}
 		}
 	}
@@ -77,6 +78,7 @@ func (s *Snake) Init() {
 }
 
 func (s *Snake) move() {
+	s.direction = s.nextDirection
 	for i := len(s.segments) - 1; i >= 0; i-- {
 		if i == 0 {
 			s.segments[i].loc = s.segments[i].loc.Add(s.direction)
